@@ -1,0 +1,6 @@
+@ReWear_HostAddress = http://localhost:5297
+
+GET {{ReWear_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
