@@ -54,8 +54,8 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.PrimitiveCollection<float[]>("Embedding")
                         .HasColumnType("real[]");
@@ -74,8 +74,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid?>("OutfitId")
-                        .HasColumnType("uuid");
+                    b.Property<long?>("NumberOfWears")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
 
                     b.Property<string>("PrintDescription")
                         .HasMaxLength(100)
@@ -90,11 +92,31 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ClothingItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FavoriteOutfit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<Guid>("OutfitId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
                     b.HasIndex("OutfitId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ClothingItems");
+                    b.ToTable("FavoriteOutfits");
                 });
 
             modelBuilder.Entity("Domain.Entities.Outfit", b =>
@@ -113,6 +135,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.PrimitiveCollection<float[]>("Embedding")
+                        .HasColumnType("real[]");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -125,6 +150,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Season")
                         .HasColumnType("text");
 
+                    b.Property<string>("Style")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -133,6 +161,50 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Outfits");
+                });
+
+            modelBuilder.Entity("Domain.Entities.OutfitClothingItem", b =>
+                {
+                    b.Property<Guid>("OutfitId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClothingItemId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("OutfitId", "ClothingItemId");
+
+                    b.HasIndex("ClothingItemId");
+
+                    b.ToTable("OutfitClothingItems");
+                });
+
+            modelBuilder.Entity("Domain.Entities.PasswordResetCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("uuid_generate_v4()");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PasswordResetCodes");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -151,14 +223,25 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<string>("GoogleId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("LoginProvider")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProfilePicture")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -198,10 +281,20 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ClothingItem", b =>
                 {
+                    b.HasOne("Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.FavoriteOutfit", b =>
+                {
                     b.HasOne("Domain.Entities.Outfit", null)
-                        .WithMany("ClothingItems")
+                        .WithMany()
                         .HasForeignKey("OutfitId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany()
@@ -217,6 +310,25 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.OutfitClothingItem", b =>
+                {
+                    b.HasOne("Domain.Entities.ClothingItem", "ClothingItem")
+                        .WithMany("OutfitClothingItems")
+                        .HasForeignKey("ClothingItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Outfit", "Outfit")
+                        .WithMany("OutfitClothingItems")
+                        .HasForeignKey("OutfitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClothingItem");
+
+                    b.Navigation("Outfit");
                 });
 
             modelBuilder.Entity("Domain.Models.ClothingTag", b =>
@@ -232,12 +344,14 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.ClothingItem", b =>
                 {
+                    b.Navigation("OutfitClothingItems");
+
                     b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Domain.Entities.Outfit", b =>
                 {
-                    b.Navigation("ClothingItems");
+                    b.Navigation("OutfitClothingItems");
                 });
 #pragma warning restore 612, 618
         }

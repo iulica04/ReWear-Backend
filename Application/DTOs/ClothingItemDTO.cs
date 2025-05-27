@@ -18,5 +18,6 @@ namespace Application.DTOs
 
         public required string FrontImageUrl { get; set; }
         public required string BackImageUrl { get; set; }
+        public uint? NumberOfWears { get; set; } = 0;
     }
 }

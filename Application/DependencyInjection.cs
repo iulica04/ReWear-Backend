@@ -17,7 +17,9 @@ namespace Application
 
             services.AddAutoMapper(typeof(MappingProfile));
             services.AddValidatorsFromAssembly(typeof(CreateUserCommandValidator).Assembly);
+            services.AddValidatorsFromAssembly(typeof(UpdateUserCommandValidator).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
 
             return services;
         }

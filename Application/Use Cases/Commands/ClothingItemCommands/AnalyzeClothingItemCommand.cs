@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Application.Models;
+using Domain.Common;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.Use_Cases.Commands.ClothingItemCommand
 {
-    public class AnalyzeClothingItemCommand
+    public class AnalyzeClothingItemCommand : IRequest<Result<ImageAnalysisResult>>
     {
-        [Required] public IFormFile ImageFront { get; set; } = default!;
-         public IFormFile? ImageBack { get; set; } = default!;
+        [Required] public required byte[] ImageFront { get; set; } 
+         public byte[]? ImageBack { get; set; } 
     }
 }

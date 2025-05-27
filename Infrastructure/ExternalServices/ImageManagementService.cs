@@ -5,6 +5,7 @@ using Google.Apis.Auth.OAuth2;
 using Domain.Common;
 using Google.Cloud.Storage.V1;
 using Application.Services;
+using Google.Protobuf;
 
 namespace Infrastructure.Services
 {
@@ -75,8 +76,11 @@ namespace Infrastructure.Services
                     string accessToken = await GetAccessTokenAsync();
                     // Prepare the request payload
                     var parts = new List<object> { new { text = prompt } };
-                    parts.AddRange(images.Select(img => new { inlineData = new { mimeType = "image/jpeg", data = Convert.ToBase64String(img) } }));
-
+                    parts.AddRange(
+                        images
+                            .Where(img => img != null && img.Length > 0)
+                            .Select(img => new { inlineData = new { mimeType = "image/jpeg", data = Convert.ToBase64String(img) } })
+                    );
                     var payload = new
                     {
                         contents = new[]
@@ -264,34 +268,47 @@ namespace Infrastructure.Services
         {
             try
             {
-                // Generare ID unic (Guid)
                 string uniqueId = Guid.NewGuid().ToString();
-
                 using var stream = new MemoryStream(image);
 
                 var storageClient = await StorageClient.CreateAsync();
 
-                // Exemplu de fileName: clothing-items/USERID/ENTITYID_front_uniqueid.jpg
+                // Exemplu: clothing-items/USERID/ENTITYID_front_uniqueid.jpg
                 string fileName = $"{entityType}/{userId}/{entityId}_{imageType}_{uniqueId}.{extension}";
 
                 var obj = new Google.Apis.Storage.v1.Data.Object
                 {
                     Bucket = BucketName,
                     Name = fileName,
-                    ContentType = $"image/{extension}" // jpeg sau png
+                    ContentType = $"image/{extension}",
+                    CacheControl = "no-cache, max-age=0" // ca să nu se cache-uiască vechiul fișier
                 };
 
+                // Upload
                 var uploaded = await storageClient.UploadObjectAsync(obj, stream);
 
-                // Returnăm gs://bucket_name/object_name
-                string gsUri = $"gs://{uploaded.Bucket}/{uploaded.Name}";
-                return Result<string>.Success(gsUri);
+                // Setează imaginea ca publică
+                uploaded.Acl = new List<Google.Apis.Storage.v1.Data.ObjectAccessControl>
+        {
+            new Google.Apis.Storage.v1.Data.ObjectAccessControl
+            {
+                Entity = "allUsers",
+                Role = "READER"
+            }
+        };
+                await storageClient.UpdateObjectAsync(uploaded);
+
+                // Construiește URL-ul public
+                string publicUrl = $"https://storage.googleapis.com/{BucketName}/{fileName}";
+
+                return Result<string>.Success(publicUrl);
             }
             catch (Exception ex)
             {
                 return Result<string>.Failure($"Image upload failed: {ex.Message}");
             }
         }
+
 
 
 
@@ -358,6 +375,57 @@ namespace Infrastructure.Services
 
             return imageList;
         }
+
+        public async Task<Result<string>> UploadProfilePictureAsync(byte[] image, string userId)
+        {
+            try
+            {
+                using var stream = new MemoryStream(image);
+                var storageClient = await StorageClient.CreateAsync();
+
+                string fileName = $"profile-picture/{userId}.jpg";
+
+                // delete the old file if it exists
+                try
+                {
+                    await storageClient.DeleteObjectAsync(BucketName, fileName);
+                }
+                catch (Google.GoogleApiException ex) when (ex.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    // do nothing, the file doesn't exist   
+                }
+
+                // upload the new file
+                var obj = new Google.Apis.Storage.v1.Data.Object
+                {
+                    Bucket = BucketName,
+                    Name = fileName,
+                    CacheControl = "no-cache, max-age=0"
+                };
+
+                var uploaded = await storageClient.UploadObjectAsync(obj, stream);
+
+                
+                uploaded.Acl = new List<Google.Apis.Storage.v1.Data.ObjectAccessControl>
+        {
+            new Google.Apis.Storage.v1.Data.ObjectAccessControl
+            {
+                Entity = "allUsers",
+                Role = "READER"
+            }
+        };
+                await storageClient.UpdateObjectAsync(uploaded);
+
+                // Return the public URL
+                string publicUrl = $"https://storage.googleapis.com/{BucketName}/{fileName}?v={DateTime.UtcNow.Ticks}";
+                return Result<string>.Success(publicUrl);
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure($"Image upload failed: {ex.Message}");
+            }
+        }
+
 
     }
 }

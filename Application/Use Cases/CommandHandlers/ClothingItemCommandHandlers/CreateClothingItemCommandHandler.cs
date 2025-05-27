@@ -12,18 +12,30 @@ namespace Application.Use_Cases.CommandHandlers.ClothingItemCommandHandlers
     {
         private readonly IClothingItemRepository clothingItemRepository;
         private readonly IClothingItemService clothingItemService;
+        private readonly IEmbeddingService embeddingService;
 
-        public CreateClothingItemCommandHandler(IClothingItemRepository clothingItemRepository, IClothingItemService clothingItemService)
+        public CreateClothingItemCommandHandler(IClothingItemRepository clothingItemRepository, IClothingItemService clothingItemService, IEmbeddingService embeddingService)
         {
             this.clothingItemRepository = clothingItemRepository;
-
             this.clothingItemService = clothingItemService;
+            this.embeddingService = embeddingService;
         }
         public async Task<Result<Guid>> Handle(CreateClothingItemCommand request, CancellationToken cancellationToken)
         {
             var clothingItemId = Guid.NewGuid();
             var bucketNameImageFront = await clothingItemService.UploadImageAsync(request.ImageFront, request.UserId.ToString(), clothingItemId.ToString(), "ClothingItem", "Front");
-            var bucketNameImageBack = await clothingItemService.UploadImageAsync(request.ImageBack, request.UserId.ToString(), clothingItemId.ToString(), "ClothingItem", "Back");
+            string? bucketNameImageBack = null;
+            if (request.ImageBack != null)
+            {
+                var result = await clothingItemService.UploadImageAsync(
+                    request.ImageBack,
+                    request.UserId.ToString(),
+                    clothingItemId.ToString(),
+                    "ClothingItem",
+                    "Back");
+
+                bucketNameImageBack = result.Data;
+            }
 
             var clothingTags = request.Tags.Select(tag => new ClothingTag
             {
@@ -45,16 +57,23 @@ namespace Application.Use_Cases.CommandHandlers.ClothingItemCommandHandlers
                 PrintDescription = request.PrintDescription,
                 Description = request.Description,
                 FrontImageUrl = bucketNameImageFront.Data,
-                BackImageUrl = bucketNameImageBack.Data
+                BackImageUrl = bucketNameImageBack,
+                Embedding = await embeddingService.GetEmbeddingAsync(request.Description),
+                NumberOfWears = 0,
             };
-            
-            var result = await clothingItemRepository.AddAsync(clothingItem);
 
-            if (result.IsSuccess)
+            try
             {
-                return Result<Guid>.Success(result.Data);
+                var result = await clothingItemRepository.AddAsync(clothingItem);
+                if (result.IsSuccess)
+                    return Result<Guid>.Success(result.Data);
+                return Result<Guid>.Failure(result.ErrorMessage);
             }
-            return Result<Guid>.Failure(result.ErrorMessage);
+            catch (Exception ex)
+            {
+                // Log ex.ToString() sau ex.InnerException?.Message
+                return Result<Guid>.Failure("Error adding clothing item: " + ex.ToString());
+            }
         }
     }
 

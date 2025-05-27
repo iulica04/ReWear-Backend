@@ -9,5 +9,8 @@
         public required string Email { get; set; }
         public required string PasswordHash { get; set; }
         public required string Role { get; set; }
+        public required string LoginProvider { get; set; }
+        public string? GoogleId { get; set; } // sub from payload
+        public string? ProfilePicture { get; set; } // from payload
     }
 }

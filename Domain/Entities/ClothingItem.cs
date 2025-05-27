@@ -15,13 +15,12 @@ namespace Domain.Entities
         public string? PrintType { get; set; }
         public string? PrintDescription { get; set; }
         public string? Description { get; set; }
-
         public required string FrontImageUrl { get; set; }
-        public required string BackImageUrl { get; set; }
-
+        public string? BackImageUrl { get; set; }
         public float[]? Embedding { get; set; }
         public DateTime CreatedAt { get; set; }
+        public uint? NumberOfWears { get; set; } = 0;
 
-
+        public List<OutfitClothingItem> OutfitClothingItems { get; set; } = new();
     }
 }

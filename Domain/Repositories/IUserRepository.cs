@@ -1,10 +1,5 @@
 ﻿using Domain.Common;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Repositories
 {
@@ -19,6 +14,7 @@ namespace Domain.Repositories
         Task  DeleteAsync(Guid id);
         Task<bool> UserNameExistsAsync(string userName);
         Task<bool> EmailExistsAsync(string email);
-        Task<string?> Login(string email, string password);
+        Task<LoginResult?> Login(string email, string password);
+        Task<LoginResult?> LoginWithGoogle(string email, string googleId);
     }
 }

@@ -26,6 +26,15 @@ namespace Infrastructure
             services.AddScoped<IOutfitRepository, OutfitRepository>();
             services.AddScoped<IOutfitService, OutfitService>();
             services.AddScoped<IEmbeddingService, EmbeddingService>();
+            services.AddScoped<IPasswordResetCodeRepository, PasswordResetCodeRepository>();
+            services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+            services.AddScoped<IFavoriteOutfitRepository, FavoriteOutfitRepository>();
+
+            services.AddHostedService<PasswordResetCleanupService>();
+            services.AddHttpClient<IEmailService, EmailService>();
+           
+                
+
             return services;
         }
     }

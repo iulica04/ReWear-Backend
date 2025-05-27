@@ -1,8 +1,10 @@
-﻿using Application.Use_Cases.Authentification;
+﻿using Application.Services;
+using Application.Use_Cases.Authentification;
 using Application.Use_Cases.Commands;
 using Application.Use_Cases.Commands.UserCommands;
 using Application.Use_Cases.Queries.UserQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReWear.Controllers
@@ -29,7 +31,7 @@ namespace ReWear.Controllers
             return CreatedAtAction(nameof(GetUserById), new { Id = result.Data }, result.Data);
         }
 
-
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
@@ -41,6 +43,7 @@ namespace ReWear.Controllers
             return NotFound(result.ErrorMessage);
         }
 
+  
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -48,7 +51,7 @@ namespace ReWear.Controllers
             return Ok(result.Data);
         }
 
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(Guid id, UpdateUserCommand command)
         {
             if (id != command.Id)
@@ -92,16 +95,46 @@ namespace ReWear.Controllers
             return Unauthorized(result.ErrorMessage);
         }
 
-        [HttpPost("login-with-firebase")]
-        public async Task<IActionResult> LoginFirebase(LoginCommand command)
+        [HttpPost("login-with-google")]
+        public async Task<IActionResult> LoginWithGoogle(GoogleLoginCommand command)
         {
             var result = await mediator.Send(command);
             if (result.IsSuccess)
             {
                 return Ok(result.Data);
             }
-            return Unauthorized(result.ErrorMessage);
+            else if (result.ErrorMessage == "A local account with this email already exists. Please log in with your email and password.")
+            {
+                return Conflict(result.ErrorMessage);
+            }
+            else if (result.ErrorMessage == "Google authentication failed.")
+            {
+                return Unauthorized(result.ErrorMessage);
+            }
+            else
+            {
+                return BadRequest(result.ErrorMessage);
+            }
 
+        }
+
+        [HttpPost("upload-profile-picture")]
+        public async Task<IActionResult> UploadProfilePicture([FromForm] UpdateProfilePictureCommand command)
+        {
+            if (command.ProfilePicture == null || command.ProfilePicture.Length == 0)
+            {
+                return BadRequest("Image is required.");
+            }
+            var result = await mediator.Send(command);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            else if (result.ErrorMessage == "User not found")
+            {
+                return NotFound(result.ErrorMessage);
+            }
+            return BadRequest(result.ErrorMessage);
         }
     }
 }

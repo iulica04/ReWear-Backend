@@ -25,6 +25,8 @@ namespace Application.Utils
 
             CreateMap<Outfit, OutfitDTO>().ReverseMap();
             CreateMap<UpdateOutfitCommand, Outfit>().ReverseMap();
+
+            CreateMap<FavoriteOutfit, FavoriteOutfitDTO>().ReverseMap();
         }
     }
 }

@@ -10,6 +10,7 @@
     <PackageReference Include="Google.Cloud.AIPlatform.V1" Version="3.25.0" />
     <PackageReference Include="Google.Protobuf" Version="3.30.2" />
     <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>

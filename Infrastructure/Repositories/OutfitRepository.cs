@@ -41,14 +41,16 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<Outfit>> GetAllAsync()
         {
             return await context.Outfits
-                .Include(o => o.ClothingItems)
+                .Include(o => o.OutfitClothingItems)
+                    .ThenInclude(oci => oci.ClothingItem)
                 .ToListAsync();
         }
 
         public async Task<Outfit?> GetByIdAsync(Guid id)
         {
             return await context.Outfits
-                .Include(o => o.ClothingItems)
+                .Include(o => o.OutfitClothingItems)
+                    .ThenInclude(oci => oci.ClothingItem)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 

@@ -13,6 +13,7 @@ namespace Application.Services
             string entityType,
             string imageType,
             string extension = "jpg");
+        Task<Result<string>> UploadProfilePictureAsync(byte[] image, string userId);
         Task<bool> ImageExistsAsync(string fileName);
         Task<Result<bool>> DeleteImageAsync(string fileName);
         Task<List<string>> ListImagesAsync();

@@ -26,29 +26,10 @@ namespace API.Controllers
         }
 
         [HttpPost("analyze")]
-        public async Task<IActionResult> Analyze([FromForm] AnalyzeClothingItemCommand request)
+        public async Task<IActionResult> Analyze([FromBody] AnalyzeClothingItemCommand request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            byte[] frontBytes;
-            byte[]? backBytes = null;
-
-            await using (var ms1 = new MemoryStream())
-            {
-                await request.ImageFront.CopyToAsync(ms1);
-                frontBytes = ms1.ToArray();
-            }
-            if (request.ImageBack != null)
-            {
-                await using (var ms2 = new MemoryStream())
-                {
-                    await request.ImageBack.CopyToAsync(ms2);
-                    backBytes = ms2.ToArray();
-                }
-            }
-
-            var result = await clothingItemService.AnalyzeClothingItemsAsync(frontBytes, backBytes);
+          
+            var result = await mediator.Send(request);
 
             if (!result.IsSuccess)
                 return StatusCode(502, result.ErrorMessage);
@@ -56,23 +37,7 @@ namespace API.Controllers
             return Ok(result.Data);
         }
 
-        //[HttpPost("upload")]
-        //public async Task<IActionResult> UploadImage(IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0)
-        //        return BadRequest("No file uploaded.");
 
-        //    using var memoryStream = new MemoryStream();
-        //    await file.CopyToAsync(memoryStream);
-        //    var imageBytes = memoryStream.ToArray();
-
-        //    var result = await clothingItemService.UploadImageAsync(imageBytes, file.FileName);
-
-        //    if (!result.IsSuccess)
-        //        return StatusCode(500, result.ErrorMessage);
-
-        //    return Ok(new { path = result.Data });
-        //}
 
         [HttpPost]
         public async Task<ActionResult<Guid>> CreateClothingItem([FromBody] CreateClothingItemCommand command)
@@ -135,7 +100,11 @@ namespace API.Controllers
             {
                 return BadRequest("Clothing item ID mismatch");
             }
-            await mediator.Send(command);
+            var result = await mediator.Send(command);
+            if (!result.IsSuccess)
+            {
+                return NotFound(result.ErrorMessage);
+            }
             return NoContent();
         }
 
@@ -151,15 +120,24 @@ namespace API.Controllers
         }
 
         [HttpGet("paginated")]
-        public async Task<ActionResult<PagedResult<ClothingItemDTO>>> GetPaginatedClothingItems([FromQuery] int page, [FromQuery] string? printType,
-            [FromQuery] int pageSize, [FromQuery] string? brand, [FromQuery] string? color, [FromQuery] string? category, string? tag)
+        public async Task<ActionResult<PagedResult<ClothingItemDTO>>> GetPaginatedClothingItems(
+            [FromQuery] int page,
+            [FromQuery] int pageSize,
+            [FromQuery] List<string>? printTypes,
+            [FromQuery] List<string>? brands,
+            [FromQuery] List<string>? colors,
+            [FromQuery] List<string>? categories,
+            [FromQuery] List<string>? tags,
+            [FromQuery] Guid userId)
         {
             Expression<Func<ClothingItem, bool>> filter = item =>
-                (string.IsNullOrEmpty(printType) || item.PrintType == printType) &&
-                (string.IsNullOrEmpty(brand) || item.Brand == brand) &&
-                (string.IsNullOrEmpty(color) || item.Color == color) &&
-                (string.IsNullOrEmpty(category) || item.Category == category)
-                && (string.IsNullOrEmpty(tag) || item.Tags.Any(t => t.Tag == tag));
+            (printTypes == null || printTypes.Count == 0 || printTypes.Contains(item.PrintType)) &&
+            (brands == null || brands.Count == 0 || brands.Contains(item.Brand)) &&
+            (colors == null || colors.Count == 0 || colors.Contains(item.Color)) &&
+            (categories == null || categories.Count == 0 || categories.Contains(item.Category)) &&
+            (tags == null || tags.Count == 0 || item.Tags.Any(t => tags.Contains(t.Tag))) &&
+            (item.UserId == userId);
+
 
             var query = new GetFilteredQuery<ClothingItem, ClothingItemDTO>
             {
@@ -175,6 +153,17 @@ namespace API.Controllers
             }
             return NotFound(result.ErrorMessage);
         }
-   
+
+        [HttpGet("get-by-name")]
+        public async Task<IActionResult> GetClothingItemsByName([FromQuery] GetClothingItemsByNameQuery query)
+        {
+            var result = await mediator.Send(query);
+
+            if (!result.IsSuccess)
+                return NotFound(result.ErrorMessage);
+
+            return Ok(result.Data);
+        }
+
     }
 }

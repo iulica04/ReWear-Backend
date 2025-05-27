@@ -82,7 +82,7 @@ namespace Infrastructure.Repositories
                 .AnyAsync(u => u.Email == email);
         }
 
-        public async Task<string?> Login(string email, string password)
+        public async Task<LoginResult?> Login(string email, string password)
         {
             var user = context.Users
                 .FirstOrDefault(u => u.Email == email);
@@ -110,7 +110,42 @@ namespace Infrastructure.Repositories
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return new LoginResult
+            {
+                Token = tokenHandler.WriteToken(token),
+                UserId = user.Id.ToString(),
+            };
+        }
+
+        public async Task<LoginResult?> LoginWithGoogle(string email, string googleId)
+        {
+            var user = context.Users.FirstOrDefault(u => u.Email == email && u.GoogleId == googleId);
+            if (user == null)
+            {
+                return null; // utilizatorul nu există
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email)
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return new LoginResult
+            {
+                Token = tokenHandler.WriteToken(token),
+                UserId = user.Id.ToString(),
+            };
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Application.Use_Cases.Queries.ClothingItemQueries
         public async Task<Result<PagedResult<ClothingItemDTO>>> Handle(GetFilteredQuery<ClothingItem, ClothingItemDTO> request, CancellationToken cancellationToken)
         {
             var clothingItems = await repository.GetAllAsync();
-            if(request.Filter != null)
+            if (request.Filter != null)
             {
                 clothingItems = clothingItems.AsQueryable()
                     .Where(request.Filter);

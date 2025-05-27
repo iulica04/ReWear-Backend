@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Use_Cases.Authentification
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginResult>>
     {
         private readonly IUserRepository repository;
 
@@ -13,19 +13,24 @@ namespace Application.Use_Cases.Authentification
             this.repository = repository;
         }
 
-        public async Task<Result<string>> Handle(LoginCommand command, CancellationToken cancellationToken)
+        public async Task<Result<LoginResult>> Handle(LoginCommand command, CancellationToken cancellationToken)
         {
+            var user = await repository.GetByEmailAsync(command.Email);
+            if (user == null)
+            {
+                return Result<LoginResult>.Failure("No account found associated with this email address. Please check if the email is correct or consider creating a new account.");
+            }
             // Call the repository to perform login
-            var token = await repository.Login(command.Email, command.Password);
+            var loginResult = await repository.Login(command.Email, command.Password);
 
             // Check if the token is null or empty
-            if (string.IsNullOrEmpty(token))
+            if (loginResult == null || string.IsNullOrEmpty(loginResult.Token))
             {
-                return Result<string>.Failure("Invalid credentials");
+                return Result<LoginResult>.Failure("Login failed: Invalid credentials. Retry or reset password.");
             }
 
             // Return success with the token
-            return Result<string>.Success(token);
+            return Result<LoginResult>.Success(loginResult);
         }
     }
 }
