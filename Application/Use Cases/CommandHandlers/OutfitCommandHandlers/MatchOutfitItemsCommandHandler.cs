@@ -2,11 +2,9 @@
 using Application.Services;
 using Application.Use_Cases.Commands.OutfitCommands;
 using Domain.Common;
-using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
 using AutoMapper;
-using Newtonsoft.Json;
 
 namespace Application.Use_Cases.CommandHandlers.OutfitCommandHandlers
 {

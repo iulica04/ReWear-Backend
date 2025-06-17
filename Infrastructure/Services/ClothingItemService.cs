@@ -27,6 +27,7 @@ namespace Infrastructure.Services
                 "- Material (string)\n" +
                 "- PrintType (string or null)\n" +
                 "- PrintDescription (string or null)\n" +
+                "- Weight of the clothing item (decimal, approximate value, non-null)"+
                 "- Description (string)\n\n" +
                 "The Description must be strictly technical and detailed. It should include observable structural and material aspects of the clothing item, such as:\n" +
                 "- Color (e.g., blue, pink, navy blue, light grey, olive green)\n" +
@@ -40,7 +41,7 @@ namespace Infrastructure.Services
                 "The description must be factual and objective. Do not use expressive or marketing-style language.\n\n" +
                 "All string values must be enclosed in double quotes. Tags must be a JSON array contains style labels (e.g., [\"Casual\", \"Minimalist\"]). Do not include markdown, explanations, or line breaks. Return **only** the raw JSON.\n\n" +
                 "Example:\n" +
-                "{\"Name\":\"T-Shirt\",\"Category\":\"Topwear\",\"Tags\":[\"Casual\",\"Minimalist\"],\"Color\":\"Red\",\"Brand\":\"Nike\",\"Material\":\"Cotton\",\"PrintType\":\"Logo\",\"PrintDescription\":\"Nike swoosh on front\",\"Description\":\"Red short-sleeved T-shirt with crew neck, made of lightweight cotton jersey. Ribbed neckline, straight stitched hem, and set-in sleeves. Front logo print centered on chest.\"}";
+                "{\"Name\":\"T-Shirt\",\"Category\":\"Topwear\",\"Tags\":[\"Casual\",\"Minimalist\"],\"Color\":\"Red\",\"Brand\":\"Nike\",\"Material\":\"Cotton\",\"PrintType\":\"Logo\",\"PrintDescription\":\"Nike swoosh on front\",\"Weight\": \"0.2\",\"Description\":\"Red short-sleeved T-shirt with crew neck, made of lightweight cotton jersey. Ribbed neckline, straight stitched hem, and set-in sleeves. Front logo print centered on chest.\"}";
 
             if (imageBack == null)
             {

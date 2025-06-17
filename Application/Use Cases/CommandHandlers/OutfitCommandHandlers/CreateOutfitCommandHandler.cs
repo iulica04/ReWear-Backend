@@ -39,6 +39,7 @@ namespace Application.Use_Cases.CommandHandlers.OutfitCommandHandlers
                         ClothingItemId = item.Id
                     });
                     item.NumberOfWears++;
+                    item.LastWornDate = DateTime.UtcNow;
                     await clothingItemRepository.UpdateAsync(item);
                 }
             }

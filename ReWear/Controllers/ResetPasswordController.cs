@@ -25,6 +25,10 @@ namespace ReWear.Controllers
             {
                 return Ok(result.Data);
             }
+            else if (result.ErrorMessage == "Email not found")
+            {
+                return NotFound(result.ErrorMessage);
+            }
             return BadRequest(result.ErrorMessage);
         }
 

@@ -5,6 +5,7 @@
         public T Data { get; }
         public bool IsSuccess { get; }
         public string ErrorMessage { get; }
+        public object Value { get; set; }
 
         protected Result(bool isSuccess, T data, string errorMessage)
         {

@@ -16,7 +16,8 @@ namespace Application.Use_Cases.Commands.ClothingItemCommand
         public string? PrintDescription { get; set; }
         public string? Description { get; set; }
         public required byte[] ImageFront { get; set; } 
-        public  byte[]? ImageBack { get; set; } 
+        public  byte[]? ImageBack { get; set; }
+        public decimal? Weight { get; set; } = 0.0m;
 
     }
 }

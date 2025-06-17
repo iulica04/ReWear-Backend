@@ -24,12 +24,7 @@ namespace Application.Use_Cases.QueryHandlers.FavoriteOutfitQueryHandlers
             {
                 return Result<FavoriteOutfitDTO>.Failure("Favorite outfit not found");
             }
-            var favoriteOutfitDto = new FavoriteOutfitDTO
-            {
-                Id = favoriteOutfit.Id,
-                UserId = favoriteOutfit.UserId,
-                OutfitId = favoriteOutfit.OutfitId,
-            };
+            var favoriteOutfitDto = mapper.Map<FavoriteOutfitDTO>(favoriteOutfit);
             return Result<FavoriteOutfitDTO>.Success(favoriteOutfitDto);
         }
     }

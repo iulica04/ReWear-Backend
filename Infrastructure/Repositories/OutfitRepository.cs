@@ -54,10 +54,18 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public Task UpdateAsync(Outfit outfit)
+        public async Task<Result<string>> UpdateAsync(Outfit outfit)
         {
-            context.Outfits.Update(outfit);
-            return context.SaveChangesAsync();
+            try
+            {
+                context.Outfits.Update(outfit);
+                await context.SaveChangesAsync();
+                return Result<string>.Success("Outfit updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure($"Error updating outfit: {ex.Message}");
+            }
         }
     }
 }

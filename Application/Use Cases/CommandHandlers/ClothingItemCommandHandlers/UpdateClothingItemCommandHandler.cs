@@ -77,8 +77,15 @@ namespace Application.Use_Cases.CommandHandlers.ClothingItemCommandHandlers
             clothingItem.FrontImageUrl = bucketNameImageFront;
             clothingItem.BackImageUrl = bucketNameImageBack;
  
-            await clothingItemRepository.UpdateAsync(clothingItem);
-            return Result<string>.Success("Clothing item updated successfully");
+            var final = await clothingItemRepository.UpdateAsync(clothingItem);
+            if(final.IsSuccess)
+            {
+                return Result<string>.Success("Clothing item updated successfully");
+            }
+            else
+            {
+                return Result<string>.Failure(final.ErrorMessage);
+            }
         }
     }
 }

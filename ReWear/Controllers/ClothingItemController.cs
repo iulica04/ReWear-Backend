@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using Domain.Entities;
 using Application.Use_Cases.Queries;
 using Application.Services;
+using Application.Use_Cases.Commands.ClothingItemCommands;
 
 namespace API.Controllers
 {
@@ -28,7 +29,7 @@ namespace API.Controllers
         [HttpPost("analyze")]
         public async Task<IActionResult> Analyze([FromBody] AnalyzeClothingItemCommand request)
         {
-          
+
             var result = await mediator.Send(request);
 
             if (!result.IsSuccess)
@@ -42,6 +43,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Guid>> CreateClothingItem([FromBody] CreateClothingItemCommand command)
         {
+            Console.WriteLine(command.ToString());
+            Console.WriteLine("Creating clothing item...");
             var result = await mediator.Send(command);
 
             if (!result.IsSuccess)
@@ -165,5 +168,55 @@ namespace API.Controllers
             return Ok(result.Data);
         }
 
+        [HttpGet("available-for-sale")]
+        public async Task<IActionResult> GetAvailableForSaleClothingItems([FromQuery] Guid userId)
+        {
+            var result = await mediator.Send(new GetClothingItemsAvaibleForSaleQuery { UserId = userId });
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return NotFound(result.ErrorMessage);
+
+        }
+
+        [HttpGet("count-by-material")]
+        public async Task<IActionResult> GetCountByMaterial([FromQuery] Guid userId)
+        {
+            var result = await mediator.Send(new GetClothingItemCountByMaterialQuery { UserId = userId });
+            return Ok(result);
+        }
+
+        [HttpGet("monthly-purchase-count")]
+        public async Task<IActionResult> GetMonthlyPurchaseCount([FromQuery] Guid userId)
+        {
+            var result = await mediator.Send(new GetMonthlyClothingPurchaseCountQuery { UserId = userId });
+            return Ok(result);
+        }
+
+        [HttpPost("estimate-carbon-footprint")]
+        public async Task<IActionResult> EstimateCarbonFootprint([FromQuery] Guid userId)
+        {
+            var result = await mediator.Send(new EstimateCarbonFootprintCommand { UserId = userId });
+            return Ok(result.Data);
+        }
+
+        [HttpGet("get-carbon-impact-equivalents")]
+        public async Task<IActionResult> GetCarbonEquivalentsImpact([FromQuery] decimal carbonFootprint)
+        {
+            var result = await mediator.Send(new GetCarbonImpactEquivalentsQuery { TotalCarbonImpact = carbonFootprint });
+            return Ok(result);
+        }
+
+        [HttpPut("mark-as-sold/{id}")]
+        public async Task<IActionResult> MarkClothingItemAsSold(Guid id)
+        {
+            var result = await mediator.Send(new MarkClothingItemAsSoldCommand { Id = id });
+            if (result.IsSuccess)
+            {
+                return NoContent();
+            }
+            return NotFound(result.ErrorMessage);
+        }
     }
 }

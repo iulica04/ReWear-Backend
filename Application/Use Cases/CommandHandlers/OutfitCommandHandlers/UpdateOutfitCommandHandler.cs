@@ -69,8 +69,15 @@ namespace Application.Use_Cases.CommandHandlers.OutfitCommandHandlers
             outfit.Description = request.Description;
             outfit.Embedding = await embeddingService.GetEmbeddingAsync(request.Description!);
 
-            await repository.UpdateAsync(outfit);
-            return Result<string>.Success("Outfit updated successfully");
+            var finalRestul = await repository.UpdateAsync(outfit);
+            if(finalRestul.IsSuccess)
+            {
+                return Result<string>.Success("Outfit updated successfully");
+            }
+            else
+            {
+                return Result<string>.Failure(finalRestul.ErrorMessage);
+            }
         }
     }
 }

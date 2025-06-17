@@ -29,6 +29,16 @@ namespace Application.Use_Cases.CommandHandlers
                 return Result<string>.Failure("User not found");
             }
 
+            Console.WriteLine("passwordHash" + user.PasswordHash);
+            Console.WriteLine(request.Password);
+            Console.WriteLine(passwordHasher.HashPassword(request.Password!));
+
+            if (!passwordHasher.Verify(user.PasswordHash!, request.Password!))
+            {
+                Console.WriteLine("Incorect password");
+                return Result<string>.Failure("Incorect password");
+            }
+
             // Dacă userul vrea să treacă de pe Google pe Local
             if (user.LoginProvider.Equals("Google", StringComparison.OrdinalIgnoreCase) &&
                 request.LoginProvider.Equals("Local", StringComparison.OrdinalIgnoreCase))
@@ -46,8 +56,16 @@ namespace Application.Use_Cases.CommandHandlers
             if (!string.IsNullOrEmpty(request.Role))
                 user.Role = request.Role;
 
-            await repository.UpdateAsync(user);
-            return Result<string>.Success("User updated successfully");
+            var result = await repository.UpdateAsync(user);
+            if (result.IsSuccess)
+            {
+                return Result<string>.Success("User updated successfully");
+            }
+            else
+            {
+                return Result<string>.Failure(result.ErrorMessage);
+            }
+
         }
     }
 }

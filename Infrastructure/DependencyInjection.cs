@@ -32,7 +32,7 @@ namespace Infrastructure
 
             services.AddHostedService<PasswordResetCleanupService>();
             services.AddHttpClient<IEmailService, EmailService>();
-           
+            services.AddHttpClient<IWeatherServices, WeatherServices>();
                 
 
             return services;

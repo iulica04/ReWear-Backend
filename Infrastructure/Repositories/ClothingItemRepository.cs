@@ -42,6 +42,17 @@ namespace Infrastructure.Repositories
         {
             return await dbContext.ClothingItems
                 .Include(ci => ci.Tags) // Eagerly load the Tags property
+                .Where(ci => ci.IsSold == false) // Exclude sold items
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<ClothingItem>> GetUnusedInLastSixMonthsAsync(Guid UserId)
+        {
+            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-6);
+
+            return await dbContext.ClothingItems
+                .Include(ci => ci.Tags)
+                .Where(ci => ci.LastWornDate == null || ci.LastWornDate < sixMonthsAgo && ci.UserId == UserId && ci.IsSold == false)
                 .ToListAsync();
         }
 
@@ -49,13 +60,59 @@ namespace Infrastructure.Repositories
         {
             return await dbContext.ClothingItems
                 .Include(ci => ci.Tags) // Eagerly load the Tags property
+                .Where(ci => ci.IsSold == false)
                 .FirstOrDefaultAsync(ci => ci.Id == id);
         }
 
-        public Task UpdateAsync(ClothingItem clothingItem)
+        public async Task<Result<string>> UpdateAsync(ClothingItem clothingItem)
         {
-            dbContext.ClothingItems.Update(clothingItem);
-            return dbContext.SaveChangesAsync();
+            try
+            {
+                dbContext.ClothingItems.Update(clothingItem);
+                await dbContext.SaveChangesAsync();
+                return Result<string>.Success("Clothing item updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Result<string>.Failure($"{ex.Message}");
+            }
         }
+
+        public async Task<Dictionary<string, int>> GetCountByMaterialAsync(Guid UserId)
+        {
+            return await dbContext.ClothingItems
+                .GroupBy(ci => ci.Material)
+                .Where(g => g.Any(ci => ci.UserId == UserId) && g.All(ci => ci.IsSold == false)) // Filter by UserId
+                .Select(g => new { Material = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Material ?? "Unknown", x => x.Count);
+        }
+
+        public async Task<Dictionary<string, int>> GetMonthlyPurchaseCountAsync(Guid userId)
+        {
+            var currentYear = DateTime.UtcNow.Year;
+
+            var monthlyData = await dbContext.ClothingItems
+                .Where(ci => ci.UserId == userId &&
+                             !ci.CreatedAt.Equals(null) &&
+                             ci.CreatedAt.Year == currentYear &&
+                             ci.IsSold == false)
+                .GroupBy(ci => ci.CreatedAt.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            var result = monthlyData.ToDictionary(
+                x => new DateTime(currentYear, x.Month, 1).ToString("MMMM"),
+                x => x.Count
+            );
+
+            return result;
+        }
+
+
+
     }
 }

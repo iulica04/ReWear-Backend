@@ -46,14 +46,14 @@ namespace Application.Use_Cases.Commands.UserCommands.UserComandsValidator
             RuleFor(x => x.Password)
             .Cascade(CascadeMode.Stop)
             .NotEmpty()
-            .When(x => x.LoginProvider == "Local")
+            .When(x => x.LoginProvider == "local")
             .WithMessage("Password is required for local login.")
             .Length(6, 50)
-            .When(x => x.LoginProvider == "Local")
+            .When(x => x.LoginProvider == "local")
             .WithMessage("Password must be between 6 and 50 characters.")
-            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$")
-            .When(x => x.LoginProvider == "Local")
-            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d])[a-zA-Z\d\S]{6,}$")
+            .When(x => x.LoginProvider == "local")
+            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
 
 
 

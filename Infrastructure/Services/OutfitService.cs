@@ -73,6 +73,26 @@ namespace Infrastructure.Services
 
         }
 
+        public async Task<Result<ReviewOutfitResult>> ReviewOutfit(string weather, byte[] image, string? userContext)
+        {
+            var prompt =
+               "You are a fashion assistant AI. Based on the current weather conditions, the outfit shown in the image, and the user's context, generate a concise JSON object with the following fields:\n\n" +
+               $"- \"Review\": A brief assessment of the outfit's suitability for the current weather: {weather}. Mention specific elements like temperature, wind, rain, or sun, and how they relate to the materials or style of the outfit.\n" +
+               "- \"Suggestions\": Concrete recommendations for accessories or clothing modifications to enhance comfort, protection, or style based on the weather and context. These should reflect current fashion trends.\n" +
+               "- \"OverallAdvice\": General advice tailored to the given weather and the described situation (e.g., if it’s hot, suggest breathable fabrics; if cold, layering; if rainy, waterproofing).\n\n" +
+               $"Context provided by the user: \"{userContext}\".\n\n" +
+               "If the outfit is not appropriate for the weather or occasion, clearly explain the issues and provide targeted improvements.\n\n" +
+               "Make the tone friendly and fashion-aware. Use modern, expressive fashion vocabulary. Do not include hashtags, emojis, or markdown formatting.\n\n" +
+               "Return ONLY the raw JSON object in one line, without line breaks, quotes around the full response, or any surrounding explanation.\n\n" +
+               "Example:\n" +
+               "{\"Review\":\"The outfit is too heavy for the current 32°C sunny weather, especially with dark layers that can trap heat.\",\"Suggestions\":\"Opt for lighter colors and airy fabrics like linen. A sunhat and UV-protective sunglasses would elevate the look while keeping it practical.\",\"OverallAdvice\":\"Stay cool and protected — choose breathable pieces and minimal layering to handle the heat gracefully.\"}";
+
+            var result = await imageManagementService.AnalyzeImageAsync<ReviewOutfitResult>(prompt, image);
+            if (!result.IsSuccess)
+                return Result<ReviewOutfitResult>.Failure(result.ErrorMessage);
+            return Result<ReviewOutfitResult>.Success(result.Data);
+        }
+
         public Task<Result<bool>> DeleteImageAsync(string fileName)
         {
             return imageManagementService.DeleteImageAsync(fileName);

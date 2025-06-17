@@ -49,9 +49,10 @@ namespace Application.Use_Cases.Commands.UserCommands.UserComandsValidator
             .Length(6, 50)
             .When(x => x.LoginProvider == "local")
             .WithMessage("Password must be between 6 and 50 characters.")
-            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$")
+            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d])[a-zA-Z\d\S]{6,}$")
             .When(x => x.LoginProvider == "local")
-            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+
         }
     }
 }

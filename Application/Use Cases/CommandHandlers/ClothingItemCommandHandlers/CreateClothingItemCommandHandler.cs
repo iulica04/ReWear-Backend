@@ -25,6 +25,8 @@ namespace Application.Use_Cases.CommandHandlers.ClothingItemCommandHandlers
             var clothingItemId = Guid.NewGuid();
             var bucketNameImageFront = await clothingItemService.UploadImageAsync(request.ImageFront, request.UserId.ToString(), clothingItemId.ToString(), "ClothingItem", "Front");
             string? bucketNameImageBack = null;
+            Console.WriteLine("TESSSSSSSSSSSSSSSSSSSSSSSSSSSST");
+            Console.WriteLine($"{request.ToString()}");
             if (request.ImageBack != null)
             {
                 var result = await clothingItemService.UploadImageAsync(
@@ -60,6 +62,7 @@ namespace Application.Use_Cases.CommandHandlers.ClothingItemCommandHandlers
                 BackImageUrl = bucketNameImageBack,
                 Embedding = await embeddingService.GetEmbeddingAsync(request.Description),
                 NumberOfWears = 0,
+                Weight = request.Weight ?? 0.0m,
             };
 
             try

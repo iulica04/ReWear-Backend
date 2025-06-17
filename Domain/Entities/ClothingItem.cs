@@ -20,6 +20,9 @@ namespace Domain.Entities
         public float[]? Embedding { get; set; }
         public DateTime CreatedAt { get; set; }
         public uint? NumberOfWears { get; set; } = 0;
+        public DateTime? LastWornDate { get; set; }
+        public decimal? Weight { get; set; } = 0.0m;
+        public Boolean? IsSold { get; set; } = false;
 
         public List<OutfitClothingItem> OutfitClothingItems { get; set; } = new();
     }

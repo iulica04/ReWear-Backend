@@ -64,6 +64,12 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool?>("IsSold")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastWornDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Material")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -89,6 +95,9 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
+
+                    b.Property<decimal?>("Weight")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 

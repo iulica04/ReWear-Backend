@@ -8,7 +8,7 @@ namespace Application.Use_Cases.Commands.ClothingItemCommand
 {
     public class AnalyzeClothingItemCommand : IRequest<Result<ImageAnalysisResult>>
     {
-        [Required] public required byte[] ImageFront { get; set; } 
+         public required byte[] ImageFront { get; set; } 
          public byte[]? ImageBack { get; set; } 
     }
 }

@@ -59,7 +59,8 @@ namespace Application.Use_Cases.QueryHandlers.OutfitQueryHandlers
                         Description = oci.ClothingItem.Description,
                         FrontImageUrl = oci.ClothingItem.FrontImageUrl,
                         BackImageUrl = oci.ClothingItem.BackImageUrl,
-                        NumberOfWears = oci.ClothingItem.NumberOfWears
+                        NumberOfWears = oci.ClothingItem.NumberOfWears,
+                        LastWornDate = oci.ClothingItem.LastWornDate
                     })
                     .ToList()
             }).ToList();

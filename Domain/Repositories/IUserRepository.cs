@@ -10,7 +10,7 @@ namespace Domain.Repositories
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByUserNameAsync(string userName);
         Task<IEnumerable<User>> GetAllAsync();
-        Task UpdateAsync(User user);
+        Task<Result<string>> UpdateAsync(User user);
         Task  DeleteAsync(Guid id);
         Task<bool> UserNameExistsAsync(string userName);
         Task<bool> EmailExistsAsync(string email);

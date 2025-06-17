@@ -58,10 +58,11 @@ namespace Infrastructure.Persistence
                 entity.Property(e => e.PrintDescription).HasMaxLength(100);
                 entity.Property(e => e.Description).HasMaxLength(2000);
                 entity.Property(e => e.FrontImageUrl).IsRequired();
-                entity.Property(e => e.BackImageUrl).IsRequired();
+                entity.Property(e => e.BackImageUrl);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.Embedding);
                 entity.Property(e => e.NumberOfWears).HasDefaultValue((uint)0);
+                entity.Property(e => e.LastWornDate).HasColumnType("timestamp with time zone");
 
                 entity.HasMany(e => e.Tags)
                     .WithOne(t => t.ClothingItem)

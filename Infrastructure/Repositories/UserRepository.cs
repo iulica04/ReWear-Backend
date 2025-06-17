@@ -3,6 +3,7 @@ using Domain.Common;
 using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistence;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -64,10 +65,18 @@ namespace Infrastructure.Repositories
             return await context.Users
                 .FirstOrDefaultAsync(u => u.UserName == userName);
         }
-        public Task UpdateAsync(User user)
+        public async Task<Result<string>> UpdateAsync(User user)
         {
-            context.Entry(user).State = EntityState.Modified;
-            return context.SaveChangesAsync();
+            try
+            {
+                context.Users.Update(user);
+                await context.SaveChangesAsync();
+                return Result<string>.Success("User updated successfully");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<string>.Failure("An error occurred while updating the user: " + ex.Message);
+            }
         }
 
         public async Task<bool> UserNameExistsAsync(string userName)

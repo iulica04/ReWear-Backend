@@ -11,5 +11,6 @@
         public string? PrintType { get; set; }
         public string? PrintDescription { get; set; }
         public string? Description { get; set; }
+        public decimal? Weight { get; set; }
     }
 }

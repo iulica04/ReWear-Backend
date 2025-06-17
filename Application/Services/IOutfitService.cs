@@ -16,5 +16,7 @@ namespace Application.Services
             string imageType,
             string extension = "jpg");
 
+        Task<Result<ReviewOutfitResult>> ReviewOutfit(string weather, byte[] image, string? userContext);
+
     }
 }

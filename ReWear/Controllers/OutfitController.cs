@@ -145,5 +145,14 @@ namespace ReWear.Controllers
                 return Ok(result.Data);
             return NotFound(result.ErrorMessage);
         }
+
+        [HttpPost("review-outfit")]
+        public async Task<IActionResult> ReviewOutfit([FromBody] ReviewOutfitCommand command)
+        {
+            var result = await mediator.Send(command);
+            if (!result.IsSuccess)
+                return BadRequest(result.ErrorMessage);
+            return Ok(result.Data);
+        }
     }
 }

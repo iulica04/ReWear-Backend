@@ -1,5 +1,4 @@
-﻿// Application/Use Cases/QueryHandlers/OutfitQueryHandlers/GetOutfitsByNameQueryHandler.cs
-using MediatR;
+﻿using MediatR;
 using Domain.Repositories;
 using Application.DTOs;
 using Domain.Common;

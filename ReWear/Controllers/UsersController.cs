@@ -58,8 +58,34 @@ namespace ReWear.Controllers
             {
                 return BadRequest("User ID mismatch");
             }
-            await mediator.Send(command);
+            var result = await mediator.Send(command);
+            if(!result.IsSuccess)
+            {
+                if(result.ErrorMessage == "User not found")
+                {
+                    return NotFound(result.ErrorMessage);
+                }
+                else
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+            }
             return NoContent();
+        }
+
+        [HttpPut("update-password/{id}")]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordCommand command)
+        {
+            var result = await mediator.Send(command);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            if (result.ErrorMessage == "User not found")
+            {
+                return NotFound(result.ErrorMessage);
+            }
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpHead("check-existence/{emailOrUsername}")]
