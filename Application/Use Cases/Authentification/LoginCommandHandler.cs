@@ -20,16 +20,16 @@ namespace Application.Use_Cases.Authentification
             {
                 return Result<LoginResult>.Failure("No account found associated with this email address. Please check if the email is correct or consider creating a new account.");
             }
-            // Call the repository to perform login
+      
             var loginResult = await repository.Login(command.Email, command.Password);
 
-            // Check if the token is null or empty
+    
             if (loginResult == null || string.IsNullOrEmpty(loginResult.Token))
             {
                 return Result<LoginResult>.Failure("Login failed: Invalid credentials. Retry or reset password.");
             }
 
-            // Return success with the token
+   
             return Result<LoginResult>.Success(loginResult);
         }
     }

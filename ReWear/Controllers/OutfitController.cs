@@ -9,6 +9,7 @@ using Domain.Entities;
 using Domain.Repositories;
 using Google.Cloud.AIPlatform.V1;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 
@@ -27,6 +28,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost("analyze-items")]
+        [Authorize]
         public async Task<IActionResult> AnalyzeOutfitItems([FromBody] AnalyzeOutfitItemsCommand command)
         {
             var result = await mediator.Send(command);
@@ -36,6 +38,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost("match-items")]
+        [Authorize]
         public async Task<IActionResult> MatchOutfitItems([FromBody] MatchOutfitItemsCommand command)
         {
             var result = await mediator.Send(command);
@@ -46,6 +49,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost("analyze-outfit")]
+        [Authorize]
         public async Task<IActionResult> AnalyzeOutfit([FromBody] AnalyzeOutfitCommand command)
         {
             var result = await mediator.Send(command);
@@ -55,6 +59,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost("create-outfit")]
+        [Authorize]
         public async Task<ActionResult<Guid>> CreateOutfit([FromBody] CreateOutfitCommand command)
         {
             var result = await mediator.Send(command);
@@ -64,6 +69,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetOutfitById(Guid id)
         {
             var result = await mediator.Send(new GetOutfitByIdQuery { Id = id });
@@ -73,6 +79,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllOutfits()
         {
             var result = await mediator.Send(new GetAllOutfitsQuery());
@@ -80,6 +87,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("paginated")]
+        [Authorize]
         public async Task<IActionResult> GetPaginatedOutfits([FromQuery] int page, [FromQuery] int pageSize,
             [FromQuery] Guid? userId, [FromQuery] Guid? clothingItemId, [FromQuery] string? season,
             [FromQuery] DateTime createdAt)
@@ -102,6 +110,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("get-by-name")]
+        [Authorize]
         public async Task<IActionResult> GetOutfitsByName([FromQuery] GetOutfitsByNameQuery query)
         {
            
@@ -114,6 +123,7 @@ namespace ReWear.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteOutfit(Guid id)
         {
             var result = await mediator.Send(new DeleteOutfitCommand(id));
@@ -123,6 +133,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateOutfit(Guid id, [FromBody] UpdateOutfitCommand command)
         {
             if(id != command.Id)
@@ -138,6 +149,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("similar")]
+        [Authorize]
         public async Task<IActionResult> GetSimilarOutfits([FromQuery] GetPaginatedSimilarOutfitsQuery query)
         {
             var result = await mediator.Send(query);
@@ -147,6 +159,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost("review-outfit")]
+        [Authorize]
         public async Task<IActionResult> ReviewOutfit([FromBody] ReviewOutfitCommand command)
         {
             var result = await mediator.Send(command);

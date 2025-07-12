@@ -22,9 +22,7 @@ namespace Infrastructure
             services.AddScoped<IClothingItemService, ClothingItemService>();
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IClothingItemRepository, ClothingItemRepository>();
-            services.AddScoped<IOLXServices, OLXService>();
             services.AddScoped<IOutfitRepository, OutfitRepository>();
-            services.AddScoped<IOutfitService, OutfitService>();
             services.AddScoped<IEmbeddingService, EmbeddingService>();
             services.AddScoped<IPasswordResetCodeRepository, PasswordResetCodeRepository>();
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();

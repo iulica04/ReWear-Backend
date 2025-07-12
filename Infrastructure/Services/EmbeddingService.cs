@@ -10,8 +10,8 @@ namespace Infrastructure.Services
     {
         private readonly HttpClient _http;
         private readonly string _endpointUrl;
-        private readonly string _projectId = "rewear-458908"; // Înlocuiește cu ID-ul proiectului tău GCP
-        private readonly string _locationId = "us-central1"; // Înlocuiește cu regiunea endpoint-ului tău (verifică documentația)
+        private readonly string _projectId = "rewear-458908"; 
+        private readonly string _locationId = "us-central1";
         private readonly string _modelId = "text-embedding-005";
 
         public EmbeddingService(HttpClient? http = null)

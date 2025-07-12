@@ -2,6 +2,7 @@
 using Application.Use_Cases.Queries.FavoriteOutfitQueries;
 using Application.Use_Cases.Queries.OutfitQueries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ReWear.Controllers
@@ -18,6 +19,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Guid>> CreateFavoriteOutfit([FromBody] CreateFavoriteOutfitCommand command)
         {
             var result = await mediator.Send(command);
@@ -27,6 +29,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult> GetFavoriteOutfitById(Guid id)
         {
             var result = await mediator.Send(new GetByIdQuery { Id = id });
@@ -36,6 +39,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("outfits/user/{userId}")]
+        [Authorize]
         public async Task<ActionResult> GetFavoriteOutfitsByUserId(Guid userId, [FromQuery] int page, [FromQuery] int pageSize)
         { 
             var result = await mediator.Send(new GetFavoriteOutfitsByUserIdQuery { UserId = userId, Page = page, PageSize = pageSize});
@@ -45,6 +49,7 @@ namespace ReWear.Controllers
         }
 
         [HttpGet("user/{userId}")]
+        [Authorize]
         public async Task<ActionResult> GetAllFavoriteOutfitsByUserId(Guid userId)
         {
             var result = await mediator.Send(new GetUserFavoriteOutfitRecordsQuery { UserId = userId });
@@ -54,6 +59,7 @@ namespace ReWear.Controllers
         }
 
         [HttpDelete("{userId}/{outfitId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteFavoriteOutfit(Guid userId, Guid outfitId)
         {
             var result = await mediator.Send(new DeleteFavoriteOutfitCommand {UserId = userId, OutfitId = outfitId});

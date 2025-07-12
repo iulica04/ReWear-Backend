@@ -43,7 +43,8 @@ namespace ReWear.Controllers
             return NotFound(result.ErrorMessage);
         }
 
-  
+
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -52,6 +53,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, UpdateUserCommand command)
         {
             if (id != command.Id)
@@ -74,6 +76,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPut("update-password/{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdatePassword(UpdatePasswordCommand command)
         {
             var result = await mediator.Send(command);
@@ -100,6 +103,7 @@ namespace ReWear.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             var result = await mediator.Send(new DeleteUserCommand(id));
@@ -145,6 +149,7 @@ namespace ReWear.Controllers
         }
 
         [HttpPost("upload-profile-picture")]
+        [Authorize]
         public async Task<IActionResult> UploadProfilePicture([FromForm] UpdateProfilePictureCommand command)
         {
             if (command.ProfilePicture == null || command.ProfilePicture.Length == 0)

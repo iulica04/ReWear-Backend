@@ -10,6 +10,7 @@ using Domain.Entities;
 using Application.Use_Cases.Queries;
 using Application.Services;
 using Application.Use_Cases.Commands.ClothingItemCommands;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -27,6 +28,7 @@ namespace API.Controllers
         }
 
         [HttpPost("analyze")]
+        [Authorize]
         public async Task<IActionResult> Analyze([FromBody] AnalyzeClothingItemCommand request)
         {
 
@@ -41,6 +43,7 @@ namespace API.Controllers
 
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Guid>> CreateClothingItem([FromBody] CreateClothingItemCommand command)
         {
             Console.WriteLine(command.ToString());
@@ -54,6 +57,7 @@ namespace API.Controllers
 
 
         [HttpDelete("delete-image-from-bucket")]
+        [Authorize]
         public async Task<IActionResult> DeleteImageFromBucket(string imagePath)
         {
             if (string.IsNullOrEmpty(imagePath))
@@ -65,6 +69,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-all-images-base64")]
+        [Authorize]
         public async Task<IActionResult> GetAllImagesAsBase64()
         {
             var images = await clothingItemService.ListImageBase64Async();
@@ -72,6 +77,7 @@ namespace API.Controllers
         }
 
         [HttpGet("list-images-from-cloud")]
+        [Authorize]
         public async Task<IActionResult> GetAllImages()
         {
             var images = await clothingItemService.ListImagesAsync();
@@ -79,6 +85,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetClothingItemById(Guid id)
         {
             var result = await mediator.Send(new GetClothingItemByIdQuery { Id = id });
@@ -90,6 +97,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllClothingItems()
         {
             var result = await mediator.Send(new GetAllClothingItemsQuery());
@@ -97,6 +105,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateClothingItem(Guid id, [FromBody] UpdateClothingItemCommand command)
         {
             if (id != command.Id)
@@ -112,6 +121,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteClothingItem(Guid id)
         {
             var result = await mediator.Send(new DeleteClothingItemCommand(id));
@@ -123,6 +133,7 @@ namespace API.Controllers
         }
 
         [HttpGet("paginated")]
+        [Authorize]
         public async Task<ActionResult<PagedResult<ClothingItemDTO>>> GetPaginatedClothingItems(
             [FromQuery] int page,
             [FromQuery] int pageSize,
@@ -158,6 +169,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-by-name")]
+        [Authorize]
         public async Task<IActionResult> GetClothingItemsByName([FromQuery] GetClothingItemsByNameQuery query)
         {
             var result = await mediator.Send(query);
@@ -169,6 +181,7 @@ namespace API.Controllers
         }
 
         [HttpGet("available-for-sale")]
+        [Authorize]
         public async Task<IActionResult> GetAvailableForSaleClothingItems([FromQuery] Guid userId)
         {
             var result = await mediator.Send(new GetClothingItemsAvaibleForSaleQuery { UserId = userId });
@@ -181,6 +194,7 @@ namespace API.Controllers
         }
 
         [HttpGet("count-by-material")]
+        [Authorize]
         public async Task<IActionResult> GetCountByMaterial([FromQuery] Guid userId)
         {
             var result = await mediator.Send(new GetClothingItemCountByMaterialQuery { UserId = userId });
@@ -188,6 +202,7 @@ namespace API.Controllers
         }
 
         [HttpGet("monthly-purchase-count")]
+        [Authorize]
         public async Task<IActionResult> GetMonthlyPurchaseCount([FromQuery] Guid userId)
         {
             var result = await mediator.Send(new GetMonthlyClothingPurchaseCountQuery { UserId = userId });
@@ -195,6 +210,7 @@ namespace API.Controllers
         }
 
         [HttpPost("estimate-carbon-footprint")]
+        [Authorize]
         public async Task<IActionResult> EstimateCarbonFootprint([FromQuery] Guid userId)
         {
             var result = await mediator.Send(new EstimateCarbonFootprintCommand { UserId = userId });
@@ -202,6 +218,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-carbon-impact-equivalents")]
+        [Authorize]
         public async Task<IActionResult> GetCarbonEquivalentsImpact([FromQuery] decimal carbonFootprint)
         {
             var result = await mediator.Send(new GetCarbonImpactEquivalentsQuery { TotalCarbonImpact = carbonFootprint });
@@ -209,6 +226,7 @@ namespace API.Controllers
         }
 
         [HttpPut("mark-as-sold/{id}")]
+        [Authorize]
         public async Task<IActionResult> MarkClothingItemAsSold(Guid id)
         {
             var result = await mediator.Send(new MarkClothingItemAsSoldCommand { Id = id });
