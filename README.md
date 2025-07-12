@@ -28,9 +28,8 @@ Provides scalable, modular, and testable RESTful APIs for the ReWear platform.
 
 ## 📄 Documentation
 
-- [Project Documentation]()
-- [Architecture Overview]()
-- [API Reference]()
+- [Project Documentation](https://drive.google.com/file/d/1CQuFK7oHlc3EdKP9F1Cj_m88jo9HtUjE/view?usp=sharing)
+- [Presentation](https://www.canva.com/design/DAGqEfq8Z0s/Hl_sSrnCxlfM0cgn0C3P7A/view?utm_content=DAGqEfq8Z0s&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hfe36a11f23)
 
 
 
